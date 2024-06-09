@@ -1,12 +1,12 @@
 package org.gym;
 
-import org.gym.util.ConnectionDb;
+import org.gym.util.DB;
 
 import java.sql.Connection;
 
 public class Main {
     public static void main(String[] args) {
-        Connection conn = ConnectionDb.getConnection();
-        ConnectionDb.closeConnection();
+        Connection conn = DB.getConnection();
+        DB.closeConnection();
     }
 }
