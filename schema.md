@@ -117,7 +117,7 @@ Table exercises {
 
 Table memberships {
     id serial [pk, not null]
-    student_id varchar [ref: > students.id, not null]
+    student_id integer [ref: > students.id, not null]
     plan_id integer [ref: > plans.id, not null]
     start_date date [not null]
     current_workout_id integer [ref: > workouts.id]
@@ -158,8 +158,6 @@ Table exercise_sets {
 Table workout_records {
     id serial [pk, not null]
     workout_id integer [ref: > workouts.id, not null]
-    exercise_id integer [ref: > exercises.id, not null]
-    date date [not null]
     exercise_id integer [ref: > exercises.id, not null]
     exercise_completed boolean [not null]
     load integer [not null]

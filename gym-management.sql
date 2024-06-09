@@ -19,7 +19,7 @@ CREATE TABLE "exercises" (
 
 CREATE TABLE "memberships" (
   "id" serial PRIMARY KEY NOT NULL,
-  "student_id" varchar NOT NULL,
+  "student_id" integer NOT NULL,
   "plan_id" integer NOT NULL,
   "start_date" date NOT NULL,
   "current_workout_id" integer
@@ -46,7 +46,6 @@ CREATE TABLE "exercise_sets" (
 CREATE TABLE "workout_records" (
   "id" serial PRIMARY KEY NOT NULL,
   "workout_id" integer NOT NULL,
-  "date" date NOT NULL,
   "exercise_id" integer NOT NULL,
   "exercise_completed" boolean NOT NULL,
   "load" integer NOT NULL,
