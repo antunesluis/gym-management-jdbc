@@ -1,8 +1,6 @@
 package org.gym.dao;
 
 import org.gym.model.Exercise;
-import org.gym.model.Student;
-import org.gym.util.DB;
 import org.gym.util.DbException;
 
 import java.sql.*;
@@ -18,134 +16,104 @@ public class ExerciseDaoJDBC implements ExerciseDao {
 
     @Override
     public void addExercise(Exercise exercise) {
-        PreparedStatement st = null;
+        String sql = "INSERT INTO exercises (name, muscles_activated) VALUES (?, ?)";
 
-        try {
-            st = conn.prepareStatement(
-                    "INSERT INTO exercises (name, muscles_activated) VALUES (?, ?)" ,
-                    Statement.RETURN_GENERATED_KEYS
-            );
-
+        try (PreparedStatement st = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             st.setString(1, exercise.getName());
             st.setString(2, exercise.getMusclesActivates());
 
             int rowsAffected = st.executeUpdate();
 
-            if (rowsAffected > 0) {
-                ResultSet rs = st.getGeneratedKeys();
+            if (rowsAffected <= 0) {
+                throw new DbException("Unexpected error! No rows affected.");
+            }
+
+            try (ResultSet rs = st.getGeneratedKeys()) {
                 if (rs.next()) {
                     int id = rs.getInt(1);
                     exercise.setId(id);
-                    DB.closeResultSet(rs);
-                    return;
                 }
             }
-            throw new DbException("Unexpected error! No rows affected.");
-        }
-        catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        }
-        finally {
-            DB.closeStatement(st);
+        } catch (SQLException e) {
+            throw new DbException("Error while adding exercise: " + e.getMessage());
         }
     }
 
     @Override
     public void updateExercise(Exercise exercise) {
-        PreparedStatement st = null;
+        String sql = "UPDATE exercises SET name = ?, muscles_activated = ? WHERE id = ?";
 
-        try {
-            st = conn.prepareStatement(
-                    "UPDATE exercises SET name = ?, muscles_activated = ? WHERE id = ?"
-            );
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setString(1, exercise.getName());
             st.setString(2, exercise.getMusclesActivates());
             st.setInt(3, exercise.getId());
 
-            st.executeUpdate();
+            int rowsAffected = st.executeUpdate();
+
+            if (rowsAffected <= 0) {
+                throw new DbException("Unexpected error! No rows affected.");
+            }
         } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
+            throw new DbException("Error while updating exercise: " + e.getMessage());
         }
     }
 
     @Override
     public void deleteExerciseById(int id) {
-        PreparedStatement st = null;
+        String sql = "DELETE FROM exercises WHERE id = ?";
 
-        try {
-            st = conn.prepareStatement(
-                    "DELETE FROM exercises WHERE id = ?"
-            );
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setInt(1, id);
 
-            st.executeUpdate();
+            int rowsAffected = st.executeUpdate();
+
+            if (rowsAffected <= 0) {
+                throw new DbException("Unexpected error! No rows affected.");
+            }
         } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
+            throw new DbException("Error while deleting exercise: " + e.getMessage());
         }
     }
 
     @Override
     public Exercise getExerciseById(int id) {
-        PreparedStatement st = null;
-        ResultSet rs = null;
+        String sql = "SELECT id, name, muscles_activated FROM exercises WHERE id = ?";
 
-        try {
-            st = conn.prepareStatement(
-                    "SELECT id, name, muscles_activated "
-                            + "FROM exercises "
-                            + "WHERE id = ?"
-            );
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, id);
 
-            st.setInt(1, id);  // Define o parâmetro como um inteiro
-            rs = st.executeQuery();
-
-            if (rs.next()) {
-                return instantiateExercise(rs);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return instantiateExercise(rs);
+                }
+                return null;
             }
-            return null;
-        }
-        catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        }
-        finally {
-            DB.closeStatement(st);
-            DB.closeResultSet(rs);
+        } catch (SQLException e) {
+            throw new DbException("Error while getting exercise by id: " + e.getMessage());
         }
     }
 
     @Override
     public List<Exercise> getAllExercises() {
-        PreparedStatement st = null;
-        ResultSet rs = null;
-        List<Exercise> exercises = new ArrayList<>();
+        String sql = "SELECT id, name, muscles_activated FROM exercises";
 
-        try {
-            st = conn.prepareStatement(
-                    "SELECT id, name, muscles_activated FROM exercises"
-            );
-            rs = st.executeQuery();
+        try (PreparedStatement st = conn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+
+            List<Exercise> exercises = new ArrayList<>();
 
             while (rs.next()) {
-                Exercise exercise = instantiateExercise(rs);
-                exercises.add(exercise);
+                exercises.add(instantiateExercise(rs));
             }
+
             return exercises;
-        }
-        catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        }
-        finally {
-            DB.closeStatement(st);
-            DB.closeResultSet(rs);
+        } catch (SQLException e) {
+            throw new DbException("Error while getting all exercises: " + e.getMessage());
         }
     }
 
     private Exercise instantiateExercise(ResultSet rs) throws SQLException {
-        Exercise exercise =  new Exercise();
+        Exercise exercise = new Exercise();
         exercise.setId(rs.getInt("id"));
         exercise.setName(rs.getString("name"));
         exercise.setMusclesActivates(rs.getString("muscles_activated"));

@@ -1,8 +1,6 @@
 package org.gym.dao;
 
-import org.gym.model.Exercise;
 import org.gym.model.Plan;
-import org.gym.model.Student;
 import org.gym.util.DB;
 import org.gym.util.DbException;
 
@@ -19,127 +17,103 @@ public class PlanDaoJDBC implements PlanDao {
 
     @Override
     public void addPlan(Plan plan) {
-        PreparedStatement st = null;
+        String sql = "INSERT INTO plans (name, monthly_fee) VALUES (?, ?)";
 
-        try {
-            st = conn.prepareStatement(
-                    "INSERT INTO plans (name, monthly_fee) VALUES (?, ?)",
-                    Statement.RETURN_GENERATED_KEYS
-            );
-
+        try (PreparedStatement st = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             st.setString(1, plan.getName());
             st.setDouble(2, plan.getMonthlyFee());
 
             int rowsAffected = st.executeUpdate();
 
-            if (rowsAffected > 0) {
-                ResultSet rs = st.getGeneratedKeys();
+            if (rowsAffected <= 0) {
+                throw new DbException("Unexpected error! No rows affected.");
+            }
+
+            try (ResultSet rs = st.getGeneratedKeys()) {
                 if (rs.next()) {
                     int id = rs.getInt(1);
                     plan.setId(id);
-                    DB.closeResultSet(rs);
-                    return;
                 }
             }
-            throw new DbException("Unexpected error! No rows affected.");
         } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
+            throw new DbException("Error while adding plan: " + e.getMessage());
         }
     }
 
     @Override
     public void updatePlan(Plan plan) {
-        PreparedStatement st = null;
+        String sql = "UPDATE plans SET name = ?, monthly_fee = ? WHERE id = ?";
 
-        try {
-            st = conn.prepareStatement(
-                    "UPDATE plans SET name = ?, monthly_fee = ? WHERE id = ?"
-            );
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setString(1, plan.getName());
             st.setDouble(2, plan.getMonthlyFee());
             st.setInt(3, plan.getId());
 
-            st.executeUpdate();
+            int rowsAffected = st.executeUpdate();
+
+            if (rowsAffected <= 0) {
+                throw new DbException("Unexpected error! No rows affected.");
+            }
         } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
+            throw new DbException("Error while updating plan: " + e.getMessage());
         }
     }
 
     @Override
-    public void deletePlanById ( int id){
-        PreparedStatement st = null;
+    public void deletePlanById(int id) {
+        String sql = "DELETE FROM plans WHERE id = ?";
 
-        try {
-            st = conn.prepareStatement(
-                    "DELETE FROM plans WHERE id = ?"
-            );
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setInt(1, id);
 
-            st.executeUpdate();
-        } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
-        }
-    }
+            int rowsAffected = st.executeUpdate();
 
-    @Override
-    public Plan getPlanById ( int id){
-        PreparedStatement st = null;
-        ResultSet rs = null;
-
-        try {
-            st = conn.prepareStatement(
-                    "SELECT id, name, monthly_fee "
-                            + "FROM plans "
-                            + "WHERE id = ?"
-            );
-
-            st.setInt(1, id);  // Define o parâmetro como um inteiro
-            rs = st.executeQuery();
-
-            if (rs.next()) {
-                return instantiatPlan(rs);
+            if (rowsAffected <= 0) {
+                throw new DbException("Unexpected error! No rows affected.");
             }
-            return null;
         } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
-            DB.closeResultSet(rs);
+            throw new DbException("Error while deleting plan: " + e.getMessage());
         }
     }
 
     @Override
-    public List<Plan> getAllPlans () {
-        PreparedStatement st = null;
-        ResultSet rs = null;
-        List<Plan> plans = new ArrayList<>();
+    public Plan getPlanById(int id) {
+        String sql = "SELECT id, name, monthly_fee FROM plans WHERE id = ?";
 
-        try {
-            st = conn.prepareStatement(
-                    "SELECT id, name, monthly_fee FROM plans"
-            );
-            rs = st.executeQuery();
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, id);
+
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return instantiatePlan(rs);
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new DbException("Error while getting plan by id: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Plan> getAllPlans() {
+        String sql = "SELECT id, name, monthly_fee FROM plans";
+
+        try (PreparedStatement st = conn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+
+            List<Plan> plans = new ArrayList<>();
 
             while (rs.next()) {
-                Plan plan = instantiatPlan(rs);
-                plans.add(plan);
+                plans.add(instantiatePlan(rs));
             }
+
             return plans;
         } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
-            DB.closeResultSet(rs);
+            throw new DbException("Error while getting all plans: " + e.getMessage());
         }
     }
 
-    private Plan instantiatPlan (ResultSet rs) throws SQLException {
+    private Plan instantiatePlan(ResultSet rs) throws SQLException {
         Plan plan = new Plan();
         plan.setId(rs.getInt("id"));
         plan.setName(rs.getString("name"));

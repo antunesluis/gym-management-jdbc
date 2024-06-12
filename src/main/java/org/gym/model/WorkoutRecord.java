@@ -2,7 +2,7 @@ package org.gym.model;
 
 import java.time.LocalDate;
 
-public class WorkoutRecords {
+public class WorkoutRecord {
     private Integer id;
     private Integer workoutId;
     private Integer exerciseId;
@@ -11,9 +11,9 @@ public class WorkoutRecords {
     private Integer load;
     private LocalDate completionDate;
 
-    public WorkoutRecords() {}
+    public WorkoutRecord() {}
 
-    public WorkoutRecords(Integer id, Integer workoutId, Integer exerciseId, Boolean exerciseCompleted, Integer load, LocalDate completionDate) {
+    public WorkoutRecord(Integer id, Integer workoutId, Integer exerciseId, Boolean exerciseCompleted, Integer load, LocalDate completionDate) {
         this.id = id;
         this.workoutId = workoutId;
         this.exerciseId = exerciseId;
@@ -72,7 +72,7 @@ public class WorkoutRecords {
 
     @Override
     public String toString() {
-        return "WorkoutRecords{" +
+        return "WorkoutRecord{" +
                 "id=" + id +
                 ", workoutId=" + workoutId +
                 ", exerciseId=" + exerciseId +

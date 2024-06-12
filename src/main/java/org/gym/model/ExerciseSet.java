@@ -7,17 +7,17 @@ public class ExerciseSet {
     private Integer seriesCount;
     private Integer minReps;
     private Integer maxReps;
-    private Integer rest_time;
+    private Integer restTime;
 
     public ExerciseSet() {}
 
-    public ExerciseSet(Integer id, Integer exerciseId, Integer seriesCount, Integer minReps, Integer maxReps, Integer rest_time) {
+    public ExerciseSet(Integer id, Integer exerciseId, Integer seriesCount, Integer minReps, Integer maxReps, Integer restTime) {
         this.id = id;
         this.exerciseId = exerciseId;
         this.seriesCount = seriesCount;
         this.minReps = minReps;
         this.maxReps = maxReps;
-        this.rest_time = rest_time;
+        this.restTime = restTime;
     }
 
     public Integer getId() {
@@ -60,12 +60,12 @@ public class ExerciseSet {
         this.maxReps = maxReps;
     }
 
-    public Integer getRest_time() {
-        return rest_time;
+    public Integer getRestTime() {
+        return restTime;
     }
 
-    public void setRest_time(Integer rest_time) {
-        this.rest_time = rest_time;
+    public void setRestTime(Integer restTime) {
+        this.restTime = restTime;
     }
 
     @Override
@@ -76,7 +76,7 @@ public class ExerciseSet {
                 ", seriesCount=" + seriesCount +
                 ", minReps=" + minReps +
                 ", maxReps=" + maxReps +
-                ", rest_time=" + rest_time +
+                ", restTime=" + restTime +
                 '}';
     }
 }

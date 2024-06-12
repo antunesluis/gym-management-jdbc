@@ -22,7 +22,11 @@ CREATE TABLE "memberships" (
   "student_id" integer NOT NULL,
   "plan_id" integer NOT NULL,
   "start_date" date NOT NULL,
-  "current_workout_id" integer
+  "current_workout_id" integer,
+  "card_number" varchar(19) NOT NULL,
+  "card_holder_name" varchar(100) NOT NULL,
+  "card_expiry_date" varchar(5) NOT NULL,
+  "card_cvv" varchar(4) NOT NULL
 );
 
 CREATE TABLE "workouts" (

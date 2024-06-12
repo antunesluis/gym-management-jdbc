@@ -5,7 +5,6 @@ import org.gym.util.DB;
 import org.gym.util.DbException;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,160 +18,119 @@ public class StudentDaoJDBC implements StudentDao {
 
     @Override
     public void addStudent(Student student) {
-        PreparedStatement st = null;
+        String sql = "INSERT INTO students (cpf, name, birth_date) VALUES (?, ?, ?)";
 
-        try {
-            st = conn.prepareStatement(
-                    "INSERT INTO students (cpf, name, birth_date) VALUES (?, ?, ?)" ,
-                    Statement.RETURN_GENERATED_KEYS
-            );
-
+        try (PreparedStatement st = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             st.setString(1, student.getCpf());
             st.setString(2, student.getName());
             st.setDate(3, Date.valueOf(student.getBirthDate()));
 
             int rowsAffected = st.executeUpdate();
 
-            if (rowsAffected > 0) {
-                ResultSet rs = st.getGeneratedKeys();
+            if (rowsAffected <= 0) {
+                throw new DbException("Unexpected error! No rows affected.");
+            }
+
+            try (ResultSet rs = st.getGeneratedKeys()) {
                 if (rs.next()) {
                     int id = rs.getInt(1);
                     student.setId(id);
-                    DB.closeResultSet(rs);
-                    return;
                 }
             }
-            throw new DbException("Unexpected error! No rows affected.");
-        }
-        catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        }
-        finally {
-            DB.closeStatement(st);
+        } catch (SQLException e) {
+            throw new DbException("Error while adding student: " + e.getMessage());
         }
     }
 
     @Override
     public void updateStudent(Student student) {
-        PreparedStatement st = null;
+        String sql = "UPDATE students SET cpf = ?, name = ?, birth_date = ? WHERE id = ?";
 
-        try {
-            st = conn.prepareStatement(
-                    "UPDATE students SET cpf = ?, name = ?, birth_date = ? WHERE id = ?"
-            );
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setString(1, student.getCpf());
             st.setString(2, student.getName());
             st.setDate(3, Date.valueOf(student.getBirthDate()));
             st.setInt(4, student.getId());
 
-            st.executeUpdate();
+            int rowsAffected = st.executeUpdate();
+
+            if (rowsAffected <= 0) {
+                throw new DbException("Unexpected error! No rows affected.");
+            }
         } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
+            throw new DbException("Error while updating student: " + e.getMessage());
         }
     }
 
     @Override
     public void deleteStudentById(int id) {
-        PreparedStatement st = null;
+        String sql = "DELETE FROM students WHERE id = ?";
 
-        try {
-            st = conn.prepareStatement(
-                    "DELETE FROM students WHERE id = ?"
-            );
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setInt(1, id);
 
-            st.executeUpdate();
+            int rowsAffected = st.executeUpdate();
+
+            if (rowsAffected <= 0) {
+                throw new DbException("Unexpected error! No rows affected.");
+            }
         } catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        } finally {
-            DB.closeStatement(st);
+            throw new DbException("Error while deleting student: " + e.getMessage());
         }
     }
 
     @Override
     public Student getStudentById(int id) {
-        PreparedStatement st = null;
-        ResultSet rs = null;
+        String sql = "SELECT id, cpf, name, birth_date FROM students WHERE id = ?";
 
-        try {
-            st = conn.prepareStatement(
-                    "SELECT id, cpf, name, birth_date "
-                    + "FROM students "
-                    + "WHERE id = ?"
-            );
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, id);
 
-            st.setInt(1, id);  // Define o parâmetro como um inteiro
-            rs = st.executeQuery();
-
-            if (rs.next()) {
-                return instantiateStudent(rs);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return instantiateStudent(rs);
+                }
+                return null;
             }
-            return null;
-        }
-        catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        }
-        finally {
-            DB.closeStatement(st);
-            DB.closeResultSet(rs);
+        } catch (SQLException e) {
+            throw new DbException("Error while getting student by id: " + e.getMessage());
         }
     }
 
     @Override
     public Student getStudentByCpf(String cpf) {
-        PreparedStatement st = null;
-        ResultSet rs = null;
+        String sql = "SELECT id, cpf, name, birth_date FROM students WHERE cpf = ?";
 
-        try {
-            st = conn.prepareStatement(
-                    "SELECT id, cpf, name, birth_date "
-                    + "FROM students "
-                    + "WHERE cpf = ?"
-            );
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setString(1, cpf);
 
-            st.setString(1, cpf);  // Define o parâmetro como uma string
-            rs = st.executeQuery();
-
-            if (rs.next()) {
-                return instantiateStudent(rs);
+            try (ResultSet rs = st.executeQuery()) {
+                if (rs.next()) {
+                    return instantiateStudent(rs);
+                }
+                return null;
             }
-            return null;
-        }
-        catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        }
-        finally {
-            DB.closeStatement(st);
-            DB.closeResultSet(rs);
+        } catch (SQLException e) {
+            throw new DbException("Error while getting student by cpf: " + e.getMessage());
         }
     }
 
     @Override
     public List<Student> getAllStudents() {
-        PreparedStatement st = null;
-        ResultSet rs = null;
-        List<Student> students = new ArrayList<>();
+        String sql = "SELECT id, cpf, name, birth_date FROM students";
 
-        try {
-            st = conn.prepareStatement(
-                    "SELECT id, cpf, name, birth_date FROM students"
-            );
-            rs = st.executeQuery();
+        try (PreparedStatement st = conn.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+
+            List<Student> students = new ArrayList<>();
 
             while (rs.next()) {
-                Student student = instantiateStudent(rs);
-                students.add(student);
+                students.add(instantiateStudent(rs));
             }
+
             return students;
-        }
-        catch (SQLException e) {
-            throw new DbException(e.getMessage());
-        }
-        finally {
-            DB.closeStatement(st);
-            DB.closeResultSet(rs);
+        } catch (SQLException e) {
+            throw new DbException("Error while getting all students: " + e.getMessage());
         }
     }
 
@@ -184,5 +142,4 @@ public class StudentDaoJDBC implements StudentDao {
         student.setBirthDate(rs.getDate("birth_date").toLocalDate());
         return student;
     }
-
 }

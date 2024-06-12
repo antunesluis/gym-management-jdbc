@@ -121,6 +121,10 @@ Table memberships {
     plan_id integer [ref: > plans.id, not null]
     start_date date [not null]
     current_workout_id integer [ref: > workouts.id]
+    card_number varchar(19) [not null]
+    card_holder_name varchar(100) [not null]
+    card_expiry_date varchar(5) [not null]
+    card_cvv varchar(4) [notnull]
 
     Indexes {
         student_id
