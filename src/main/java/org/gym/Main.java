@@ -1,7 +1,11 @@
 package org.gym;
 
 import org.gym.dao.DaoFactory;
+import org.gym.dao.ExerciseDao;
+import org.gym.dao.PlanDao;
 import org.gym.dao.StudentDao;
+import org.gym.model.Exercise;
+import org.gym.model.Plan;
 import org.gym.model.Student;
 import org.gym.util.DB;
 
@@ -34,6 +38,42 @@ public class Main {
         student.addStudent(e3);
          */
 
+        System.out.println("-------------------- Exercicios --------------------- ");
+        ExerciseDao exercise = DaoFactory.createExerciseDao();
 
+        System.out.println("\nCriando Exercicio");
+        Exercise ex = new Exercise(null, "juaozao", "coraçao e biceps" );
+        exercise.addExercise(ex);
+
+        System.out.println("\nBuscando exercicio por id: ");
+        Exercise ex1 = exercise.getExerciseById(1);
+        System.out.println(ex1);
+
+        System.out.println("\nBuscando Todos os exercicios: ");
+        List<Exercise> exercises = exercise.getAllExercises();
+        for (Exercise e : exercises) {
+            System.out.println(e);
+        }
+
+        System.out.println("-------------------- Planos --------------------- ");
+        PlanDao plan = DaoFactory.createPlanDao();
+
+        System.out.println("\nCriando Plano");
+        Plan p1 = new Plan(null, "caludio", 10.32 );
+        plan.addPlan(p1);
+
+        System.out.println("\nAtualizando Plano");
+        p1.setName("caludio novao");
+        plan.updatePlan(p1);
+
+        System.out.println("\nBuscando Plano por id: ");
+        Plan p2 = plan.getPlanById(1);
+        System.out.println(p2);
+
+        System.out.println("\nBuscando Todos os Planos: ");
+        List<Plan> plans = plan.getAllPlans();
+        for (Plan p : plans) {
+            System.out.println(p);
+        }
     }
 }

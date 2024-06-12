@@ -9,10 +9,10 @@ public class DaoFactory {
     }
 
     public static ExerciseDao createExerciseDao() {
-        return new ExerciseDaoJDBC();
+        return new ExerciseDaoJDBC(DB.getConnection());
     }
 
     public static PlanDao createPlanDao() {
-        return new PlanDaoJDBC();
+        return new PlanDaoJDBC(DB.getConnection());
     }
 }
