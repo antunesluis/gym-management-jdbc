@@ -120,14 +120,13 @@ public class StudentDaoJDBC implements StudentDao {
         String sql = "SELECT id, cpf, name, birth_date FROM students";
 
         try (PreparedStatement st = conn.prepareStatement(sql);
-             ResultSet rs = st.executeQuery()) {
+                ResultSet rs = st.executeQuery()) {
 
             List<Student> students = new ArrayList<>();
 
             while (rs.next()) {
                 students.add(instantiateStudent(rs));
             }
-
             return students;
         } catch (SQLException e) {
             throw new DbException("Error while getting all students: " + e.getMessage());
