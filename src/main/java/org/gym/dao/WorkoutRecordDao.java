@@ -1,6 +1,5 @@
 package org.gym.dao;
 
-import org.gym.model.Workout;
 import org.gym.model.WorkoutRecord;
 
 import java.util.List;

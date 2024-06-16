@@ -32,4 +32,8 @@ public class DaoFactory {
     public static WorkoutRecordDao createWorkoutRecordDao(Connection conn) {
         return new WorkoutRecordDaoJDBC(conn);
     }
+
+    public static ExerciseSetExerciseDao createExerciseSetExerciseDao() {
+        return new ExerciseSetExerciseDaoJDBC(DB.getConnection());
+    }
 }

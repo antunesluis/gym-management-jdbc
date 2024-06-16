@@ -93,7 +93,7 @@ public class StudentHandler implements UserActionHandler {
         System.out.print("Student ID: ");
         int id = Integer.parseInt(scanner.nextLine());
         studentDao.deleteStudentById(id);
-        System.out.println("Student deleted successfully!");
+        System.out.println("Student feleted successfully!");
     }
 
     private void listStudents() {
