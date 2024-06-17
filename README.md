@@ -23,3 +23,17 @@ Em Java, crie um programa para controle de uma academia que atenda aos seguintes
    - Marcar exercícios do treino que foram concluídos.
    - Alterar a carga de um determinado exercício.
    - Encerrar um treino.
+
+# DB schema
+
+<div align="center">
+  <img src="https://github.com/antunesluis/gym-management-jdbc/blob/main/db-schema-diagram.png" />
+</div>
+
+- `students` e `plans` são tabelas básicas contendo informações sobre alunos e planos de academia.
+- `memberships` conecta alunos e planos, além de registrar informações de pagamento e associar o treino atual.
+- `exercises` contém a lista de exercícios disponíveis na academia.
+- `exercise_sets` define um conjunto de exercícios, incluindo séries, repetições e tempo de descanso.
+- `exercise_set_exercises` é uma tabela de junção que mapeia muitos-para-muitos entre conjuntos de exercícios e exercícios.
+- `workouts` define treinos, associando um conjunto de exercícios e uma associação específica.
+- `workout_records` registra o progresso dos treinos, associando cada exercício a um treino específico e marcando se foi completado.
