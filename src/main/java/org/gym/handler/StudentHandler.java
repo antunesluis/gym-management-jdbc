@@ -3,10 +3,10 @@ package org.gym.handler;
 import org.gym.dao.DaoFactory;
 import org.gym.dao.StudentDao;
 import org.gym.model.Student;
+import org.gym.util.DbException;
 
 import java.sql.Connection;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Scanner;
 
 public class StudentHandler implements UserActionHandler {
@@ -62,44 +62,74 @@ public class StudentHandler implements UserActionHandler {
     }
 
     private void addStudent() {
-        System.out.print("CPF: ");
-        String cpf = scanner.nextLine();
-        System.out.print("Name: ");
-        String name = scanner.nextLine();
-        System.out.print("Date of Birth (YYYY-MM-DD): ");
-        String birthDate = scanner.nextLine();
+        try {
+            System.out.print("CPF: ");
+            String cpf = scanner.nextLine();
+            System.out.print("Name: ");
+            String name = scanner.nextLine();
+            System.out.print("Date of Birth (YYYY-MM-DD): ");
+            String birthDate = scanner.nextLine();
 
-        Student student = new Student(null, cpf, name, LocalDate.parse(birthDate));
-        studentDao.addStudent(student);
-        System.out.println("Student added successfully!");
+            Student student = new Student(null, cpf, name, LocalDate.parse(birthDate));
+            studentDao.addStudent(student);
+            System.out.println("Student added successfully!");
+        } catch (DbException e ) {
+            System.out.println("Error adding student: " + e.getMessage());
+        }
     }
 
     private void updateStudent() {
-        System.out.print("Student ID: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        System.out.print("CPF: ");
-        String cpf = scanner.nextLine();
-        System.out.print("Name: ");
-        String name = scanner.nextLine();
-        System.out.print("Date of Birth (YYYY-MM-DD): ");
-        String birthDate = scanner.nextLine();
+        try {
+            System.out.print("Enter the ID of the student to update: ");
+            int id = Integer.parseInt(scanner.nextLine());
+            Student existingStudent = studentDao.getStudentById(id);
 
-        Student student = new Student(id, cpf, name, LocalDate.parse(birthDate));
-        studentDao.updateStudent(student);
-        System.out.println("Student updated successfully!");
+            if (existingStudent == null ) {
+                System.out.println("Student not found.");
+                return;
+            }
+
+            System.out.print("CPF (current: " + existingStudent.getCpf() + "): ");
+            String cpf = scanner.nextLine();
+
+            System.out.print("Name (current: " + existingStudent.getName() + "): ");
+            String name = scanner.nextLine();
+
+            System.out.print("Date of Birth (YYYY-MM-DD) (current: " + existingStudent.getBirthDate() + "): ");
+            String birthDate = scanner.nextLine();
+
+            Student student = new Student(id, cpf, name, LocalDate.parse(birthDate));
+            studentDao.updateStudent(student);
+            System.out.println("Student updated successfully!");
+        } catch (DbException e ) {
+            System.out.println("Error updating Student: " + e.getMessage());
+        } catch (NumberFormatException e ) {
+            System.out.println("Invalid ID format. Please enter a number");
+        }
     }
 
     private void deleteStudent() {
-        System.out.print("Student ID: ");
-        int id = Integer.parseInt(scanner.nextLine());
-        studentDao.deleteStudentById(id);
-        System.out.println("Student feleted successfully!");
+        try {
+            System.out.print("Enter the ID of the student to delete: ");
+            int id = Integer.parseInt(scanner.nextLine());
+
+            studentDao.deleteStudentById(id);
+            System.out.println("Student deleted successfully!");
+        } catch (DbException e ) {
+            System.out.println("Error deleting student: " + e.getMessage());
+        } catch (NumberFormatException e ) {
+            System.out.println("Invalid ID format. Please enter a number");
+        }
     }
 
     private void listStudents() {
-        List<Student> students = studentDao.getAllStudents();
-        for (Student student : students) {
-            System.out.println(student);
+        try {
+            System.out.println("Listing all students:");
+            studentDao.getAllStudents().forEach(student ->
+                    System.out.println(student.getId() + ": " + student.getName() + " - " + student.getCpf() + " - " + student.getBirthDate()));
+        } catch (DbException e) {
+            System.out.println("Error retrieving students: " + e.getMessage());
         }
+
     }
 }

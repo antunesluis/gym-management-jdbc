@@ -2,7 +2,6 @@ package org.gym.model;
 
 public class ExerciseSet {
     private Integer id;
-    private Integer exerciseId;
 
     private Integer seriesCount;
     private Integer minReps;
@@ -11,9 +10,8 @@ public class ExerciseSet {
 
     public ExerciseSet() {}
 
-    public ExerciseSet(Integer id, Integer exerciseId, Integer seriesCount, Integer minReps, Integer maxReps, Integer restTime) {
+    public ExerciseSet(Integer id, Integer seriesCount, Integer minReps, Integer maxReps, Integer restTime) {
         this.id = id;
-        this.exerciseId = exerciseId;
         this.seriesCount = seriesCount;
         this.minReps = minReps;
         this.maxReps = maxReps;
@@ -26,14 +24,6 @@ public class ExerciseSet {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Integer getExerciseId() {
-        return exerciseId;
-    }
-
-    public void setExerciseId(Integer exerciseId) {
-        this.exerciseId = exerciseId;
     }
 
     public Integer getSeriesCount() {
@@ -72,7 +62,6 @@ public class ExerciseSet {
     public String toString() {
         return "ExerciseSet{" +
                 "id=" + id +
-                ", exerciseId=" + exerciseId +
                 ", seriesCount=" + seriesCount +
                 ", minReps=" + minReps +
                 ", maxReps=" + maxReps +

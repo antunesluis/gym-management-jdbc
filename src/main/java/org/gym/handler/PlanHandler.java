@@ -2,6 +2,8 @@ package org.gym.handler;
 
 import org.gym.dao.DaoFactory;
 import org.gym.dao.PlanDao;
+import org.gym.model.Plan;
+import org.gym.util.DbException;
 
 import java.sql.Connection;
 import java.util.Scanner;
@@ -17,6 +19,111 @@ public class PlanHandler implements UserActionHandler {
 
     @Override
     public void execute() {
+        String option;
+        do {
+            displayMenu();
+            option = scanner.nextLine();
+            try {
+                switch (option) {
+                    case "1":
+                        addPlan();
+                        break;
+                    case "2":
+                        updatePlan();
+                        break;
+                    case "3":
+                        deletePlan();
+                        break;
+                    case "4":
+                        listStudents();
+                        break;
+                    case "0":
+                        System.out.println("Returning to the main menu...");
+                        return;
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                        break;
+                }
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        } while (!option.equals("0"));
+    }
 
+    private void addPlan() {
+        try {
+            System.out.print("Name: ");
+            String name = scanner.nextLine();
+
+            System.out.print("Monthly fee: ");
+            Double monthlyFee = Double.parseDouble(scanner.nextLine());
+
+            Plan plan = new Plan(null, name, monthlyFee);
+            planDao.addPlan(plan);
+            System.out.println("Plan added successfully!");
+        } catch (DbException e ) {
+            System.out.println("Error adding plan: " + e.getMessage());
+        }
+    }
+
+    private void updatePlan() {
+        try {
+            System.out.print("Enter the ID of the plan to update: ");
+            int id = Integer.parseInt(scanner.nextLine());
+            Plan existingPlan = planDao.getPlanById(id);
+
+            if (existingPlan == null ) {
+                System.out.println("Plan not found.");
+                return;
+            }
+
+            System.out.print("Name (current: " + existingPlan.getName() + "): ");
+            String name = scanner.nextLine();
+
+            System.out.print("Monthly fee (current: " + existingPlan.getMonthlyFee() + "): ");
+            Double monthlyFee = Double.parseDouble(scanner.nextLine());
+
+            Plan plan = new Plan(id, name, monthlyFee);
+            planDao.updatePlan(plan);
+            System.out.println("Plan updated successfully!");
+        } catch (DbException e ) {
+            System.out.println("Error updating Plan: " + e.getMessage());
+        } catch (NumberFormatException e ) {
+            System.out.println("Invalid data input. Please enter a number");
+        }
+    }
+
+    private void deletePlan() {
+        try {
+            System.out.print("Enter the ID of the plan to delete: ");
+            int id = Integer.parseInt(scanner.nextLine());
+
+            planDao.deletePlanById(id);
+            System.out.println("Plan deleted successfully!");
+        } catch (DbException e ) {
+            System.out.println("Error deleting plan: " + e.getMessage());
+        } catch (NumberFormatException e ) {
+            System.out.println("Invalid ID format. Please enter a number");
+        }
+    }
+
+    private void listStudents() {
+        try {
+            System.out.println("Listing all plans:");
+            planDao.getAllPlans().forEach(plan ->
+                    System.out.println(plan.getId() + ": " + plan.getName() + " - " + plan.getMonthlyFee()));
+        } catch (DbException e) {
+            System.out.println("Error retrieving plans: " + e.getMessage());
+        }
+    }
+
+    private void displayMenu() {
+        System.out.println("\n-- Manage Plans --");
+        System.out.println("1 - Add Plan");
+        System.out.println("2 - Update Plan");
+        System.out.println("3 - Delete Plan");
+        System.out.println("4 - List P");
+        System.out.println("0 - Back");
+        System.out.print("Select an option: ");
     }
 }

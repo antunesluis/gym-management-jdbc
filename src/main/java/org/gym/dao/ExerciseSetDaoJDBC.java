@@ -17,14 +17,13 @@ public class ExerciseSetDaoJDBC implements ExerciseSetDao {
 
     @Override
     public void addExerciseSet(ExerciseSet exerciseSet) {
-        String sql = "INSERT INTO exercise_sets (exercise_id, series_count, min_reps, max_reps, rest_time) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO exercise_sets (series_count, min_reps, max_reps, rest_time) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement st = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            st.setInt(1, exerciseSet.getExerciseId());
-            st.setInt(2, exerciseSet.getSeriesCount());
-            st.setInt(3, exerciseSet.getMinReps());
-            st.setInt(4, exerciseSet.getMaxReps());
-            st.setInt(5, exerciseSet.getRestTime());
+            st.setInt(1, exerciseSet.getSeriesCount());
+            st.setInt(2, exerciseSet.getMinReps());
+            st.setInt(3, exerciseSet.getMaxReps());
+            st.setInt(4, exerciseSet.getRestTime());
 
             int rowsAffected = st.executeUpdate();
 
@@ -45,15 +44,14 @@ public class ExerciseSetDaoJDBC implements ExerciseSetDao {
 
     @Override
     public void updateExerciseSet(ExerciseSet exerciseSet) {
-        String sql = "UPDATE exercise_sets SET exercise_id = ?, series_count = ?, min_reps = ?, max_reps = ?, rest_time = ? WHERE id = ?";
+        String sql = "UPDATE exercise_sets SET series_count = ?, min_reps = ?, max_reps = ?, rest_time = ? WHERE id = ?";
 
         try (PreparedStatement st = conn.prepareStatement(sql)) {
-            st.setInt(1, exerciseSet.getExerciseId());
-            st.setInt(2, exerciseSet.getSeriesCount());
-            st.setInt(3, exerciseSet.getMinReps());
-            st.setInt(4, exerciseSet.getMaxReps());
-            st.setInt(5, exerciseSet.getRestTime());
-            st.setInt(6, exerciseSet.getId());
+            st.setInt(1, exerciseSet.getSeriesCount());
+            st.setInt(2, exerciseSet.getMinReps());
+            st.setInt(3, exerciseSet.getMaxReps());
+            st.setInt(4, exerciseSet.getRestTime());
+            st.setInt(5, exerciseSet.getId());
 
             int rowsAffected = st.executeUpdate();
 
@@ -83,7 +81,7 @@ public class ExerciseSetDaoJDBC implements ExerciseSetDao {
 
     @Override
     public ExerciseSet getExerciseSetById(int id) {
-        String sql = "SELECT id, exercise_id, series_count, min_reps, max_reps, rest_time FROM exercise_sets WHERE id = ?";
+        String sql = "SELECT id, series_count, min_reps, max_reps, rest_time FROM exercise_sets WHERE id = ?";
 
         try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setInt(1, id);
@@ -101,7 +99,7 @@ public class ExerciseSetDaoJDBC implements ExerciseSetDao {
 
     @Override
     public List<ExerciseSet> getAllExercisesSets() {
-        String sql = "SELECT id, exercise_id, series_count, min_reps, max_reps, rest_time FROM exercise_sets";
+        String sql = "SELECT id, series_count, min_reps, max_reps, rest_time FROM exercise_sets";
 
         try (PreparedStatement st = conn.prepareStatement(sql);
              ResultSet rs = st.executeQuery()) {
@@ -121,7 +119,6 @@ public class ExerciseSetDaoJDBC implements ExerciseSetDao {
     private ExerciseSet instantiateExerciseSet(ResultSet rs) throws SQLException {
         ExerciseSet exerciseSet = new ExerciseSet();
         exerciseSet.setId(rs.getInt("id"));
-        exerciseSet.setExerciseId(rs.getInt("exercise_id"));
         exerciseSet.setSeriesCount(rs.getInt("series_count"));
         exerciseSet.setMinReps(rs.getInt("min_reps"));
         exerciseSet.setMaxReps(rs.getInt("max_reps"));
