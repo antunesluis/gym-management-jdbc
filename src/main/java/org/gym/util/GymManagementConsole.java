@@ -1,9 +1,10 @@
 package org.gym.util;
 
-import org.gym.handler.ExerciseHandler;
-import org.gym.handler.StudentHandler;
-import org.gym.handler.PlanHandler;
-import org.gym.handler.WorkoutHandler;
+import org.gym.dao.WorkoutRecordDao;
+import org.gym.handler.*;
+import org.gym.model.ExerciseSet;
+import org.gym.model.ExerciseSetExercise;
+import org.gym.model.WorkoutRecord;
 
 import java.sql.Connection;
 import java.util.Scanner;
@@ -12,15 +13,23 @@ public class GymManagementConsole {
     private final Scanner scanner;
     private final StudentHandler studentHandler;
     private final PlanHandler planHandler;
-    private final WorkoutHandler workoutHandler;
     private final ExerciseHandler exerciseHandler;
+    private final MembershipHandler membershipHandler;
+    private final WorkoutHandler workoutHandler;
+    private final WorkoutRecordHandler workoutRecordHandler;
+    private final ExerciseSetHandler exerciseSetHandler;
+    private final ExerciseSetExerciseHandler exerciseSetExerciseHandler;
 
-    public GymManagementConsole(Connection conn) {
+    public GymManagementConsole(Connection conn, MembershipHandler membershipHandler, ExerciseSet exerciseSet, ExerciseSetExercise exerciseSetExercise) {
         this.scanner = new Scanner(System.in);
         this.studentHandler = new StudentHandler(conn, scanner);
-        this.planHandler = new PlanHandler(conn, scanner);
-        this.workoutHandler = new WorkoutHandler(conn, scanner);
         this.exerciseHandler = new ExerciseHandler(conn, scanner);
+        this.planHandler = new PlanHandler(conn, scanner);
+        this.membershipHandler = new MembershipHandler(conn, scanner);
+        this.workoutHandler = new WorkoutHandler(conn, scanner);
+        this.workoutRecordHandler = new WorkoutRecordHandler(conn, scanner);
+        this.exerciseSetHandler = new ExerciseSetHandler(conn, scanner);
+        this.exerciseSetExerciseHandler = new ExerciseSetExerciseHandler(conn, scanner);
     }
 
     public void start() {

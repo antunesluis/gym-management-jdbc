@@ -33,7 +33,7 @@ public class DaoFactory {
         return new WorkoutRecordDaoJDBC(conn);
     }
 
-    public static ExerciseSetExerciseDao createExerciseSetExerciseDao() {
-        return new ExerciseSetExerciseDaoJDBC(DB.getConnection());
+    public static ExerciseSetExerciseDao createExerciseSetExerciseDao(Connection conn) {
+        return new ExerciseSetExerciseDaoJDBC(conn);
     }
 }
