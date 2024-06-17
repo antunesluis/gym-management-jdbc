@@ -1,6 +1,6 @@
 # Projeto
 
-Em Java, crie um programa para controle de uma academia que atenda aos seguintes requisitos mínimos:
+Projeto dedicado à implementação do segundo trabalho da disciplina de Paradigmas de Programação 2024/1 (elc117), focado na criação de um serviço de gerenciamento para academias.
 
 1. Os dados de alunos e de exercícios devem ser armazenados em uma base de dados relacional (postgres, mysql, sqlserver etc.). Os dados de outras entidades podem ser armazenados em listas em memória (quem desejar, pode armazená-los no banco também).
 
@@ -29,11 +29,3 @@ Em Java, crie um programa para controle de uma academia que atenda aos seguintes
 <div align="center">
   <img src="https://github.com/antunesluis/gym-management-jdbc/blob/main/db-schema-diagram.png" />
 </div>
-
-- `students` e `plans` são tabelas básicas contendo informações sobre alunos e planos de academia.
-- `memberships` conecta alunos e planos, além de registrar informações de pagamento e associar o treino atual.
-- `exercises` contém a lista de exercícios disponíveis na academia.
-- `exercise_sets` define um conjunto de exercícios, incluindo séries, repetições e tempo de descanso.
-- `exercise_set_exercises` é uma tabela de junção que mapeia muitos-para-muitos entre conjuntos de exercícios e exercícios.
-- `workouts` define treinos, associando um conjunto de exercícios e uma associação específica.
-- `workout_records` registra o progresso dos treinos, associando cada exercício a um treino específico e marcando se foi completado.
