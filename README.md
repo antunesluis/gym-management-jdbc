@@ -1,6 +1,6 @@
 # Projeto
 
-Projeto dedicado à implementação do segundo trabalho da disciplina de Paradigmas de Programação 2024/1 (elc117), focado na criação de um serviço de gerenciamento para academias.
+Projeto dedicado à implementação do segundo trabalho da disciplina de Paradigmas de Programação 2024/1 (elc117), focado na criação de um serviço de gerenciamento para academias em Java.
 
 ## Instruções sobre a implementação
 
