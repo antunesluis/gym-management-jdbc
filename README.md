@@ -2,6 +2,8 @@
 
 Projeto dedicado à implementação do segundo trabalho da disciplina de Paradigmas de Programação 2024/1 (elc117), focado na criação de um serviço de gerenciamento para academias.
 
+## Instruções sobre a implementação
+
 1. Os dados de alunos e de exercícios devem ser armazenados em uma base de dados relacional (postgres, mysql, sqlserver etc.). Os dados de outras entidades podem ser armazenados em listas em memória (quem desejar, pode armazená-los no banco também).
 
 2. Deve ser possível cadastrar alunos: incluir, alterar, excluir, listar, buscar pelo CPF, e pelo nome. Cada aluno deve ter: CPF, nome, data de nascimento.
