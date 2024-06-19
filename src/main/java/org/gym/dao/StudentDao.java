@@ -11,4 +11,5 @@ public interface StudentDao {
     Student getStudentById(int id);
     Student getStudentByCpf(String cpf);
     List<Student> getAllStudents();
+    boolean existsById(int id);
 }

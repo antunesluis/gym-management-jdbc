@@ -2,10 +2,14 @@ package org.gym.handler;
 
 import org.gym.dao.DaoFactory;
 import org.gym.dao.PlanDao;
+import org.gym.model.Membership;
 import org.gym.model.Plan;
+import org.gym.model.Student;
 import org.gym.util.DbException;
+import org.gym.util.ValidationException;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.Scanner;
 
 public class PlanHandler implements UserActionHandler {
@@ -35,7 +39,7 @@ public class PlanHandler implements UserActionHandler {
                         deletePlan();
                         break;
                     case "4":
-                        listStudents();
+                        listPlans();
                         break;
                     case "0":
                         System.out.println("Returning to the main menu...");
@@ -70,13 +74,11 @@ public class PlanHandler implements UserActionHandler {
         try {
             System.out.print("Enter the ID of the plan to update: ");
             int id = Integer.parseInt(scanner.nextLine());
-            Plan existingPlan = planDao.getPlanById(id);
-
-            if (existingPlan == null ) {
-                System.out.println("Plan not found.");
-                return;
+            if (!planDao.existsById(id)) {
+                throw new ValidationException("Exercise not found.");
             }
 
+            Plan existingPlan = planDao.getPlanById(id);
             System.out.print("Name (current: " + existingPlan.getName() + "): ");
             String name = scanner.nextLine();
 
@@ -107,13 +109,21 @@ public class PlanHandler implements UserActionHandler {
         }
     }
 
-    private void listStudents() {
+    private void listPlans() {
         try {
+            List<Plan> plans = planDao.getAllPlans();
+
+            if (plans.isEmpty()) {
+                System.out.println("No plans found.");
+                return;
+            }
+
             System.out.println("Listing all plans:");
-            planDao.getAllPlans().forEach(plan ->
-                    System.out.println(plan.getId() + ": " + plan.getName() + " - " + plan.getMonthlyFee()));
+            for (Plan plan : plans) {
+                System.out.println(plan);
+            }
         } catch (DbException e) {
-            System.out.println("Error retrieving plans: " + e.getMessage());
+            System.out.println("Error while listing memberships: " + e.getMessage());
         }
     }
 

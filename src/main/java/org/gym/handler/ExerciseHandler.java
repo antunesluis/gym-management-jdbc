@@ -4,8 +4,10 @@ import org.gym.dao.DaoFactory;
 import org.gym.dao.ExerciseDao;
 import org.gym.model.Exercise;
 import org.gym.util.DbException;
+import org.gym.util.ValidationException;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.Scanner;
 
 public class ExerciseHandler implements UserActionHandler {
@@ -73,12 +75,11 @@ public class ExerciseHandler implements UserActionHandler {
         try {
             System.out.print("Enter the ID of the exercise to update: ");
             int id = Integer.parseInt(scanner.nextLine());
-            Exercise existingExercise = exerciseDao.getExerciseById(id);
-
-            if (existingExercise == null) {
-                System.out.println("Exercise not found.");
-                return;
+            if (!exerciseDao.existsById(id)) {
+                throw new ValidationException("Exercise not found.");
             }
+
+            Exercise existingExercise = exerciseDao.getExerciseById(id);
             System.out.print("Name (current: " + existingExercise.getName() + "): ");
             String name = scanner.nextLine();
             System.out.print("Muscles activated (current: " + existingExercise.getMusclesActivates() + "): ");
@@ -112,21 +113,29 @@ public class ExerciseHandler implements UserActionHandler {
 
     private void listExercise() {
         try {
-            System.out.println("Listing all exercises:");
-            exerciseDao.getAllExercises().forEach(exercise ->
-                    System.out.println(exercise.getId() + ": " + exercise.getName() + " - " + exercise.getMusclesActivates()));
+            List<Exercise> exercises = exerciseDao.getAllExercises();
+
+            if (exercises.isEmpty()) {
+                System.out.println("No exercises found.");
+                return;
+            }
+
+            System.out.println("Listing all students:");
+            for (Exercise exercise : exercises) {
+                System.out.println(exercise);
+            }
         } catch (DbException e) {
-            System.out.println("Error retrieving exercises: " + e.getMessage());
+            System.out.println("Error while listing exercises: " + e.getMessage());
         }
     }
 
 
     private void displayMenu() {
-        System.out.println("\n-- Manage Students --");
+        System.out.println("\n-- Manage Exercises --");
         System.out.println("1 - Add Exercise");
         System.out.println("2 - Update Exercise");
         System.out.println("3 - Delete Exercise");
-        System.out.println("4 - Exercises Students");
+        System.out.println("4 - List Exercises");
         System.out.println("0 - Back");
         System.out.print("Select an option: ");
     }

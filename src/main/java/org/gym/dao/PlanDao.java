@@ -10,4 +10,5 @@ public interface PlanDao {
     void deletePlanById(int id);
     Plan getPlanById(int id);
     List<Plan> getAllPlans();
+    boolean existsById(int id);
 }

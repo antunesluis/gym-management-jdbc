@@ -10,4 +10,5 @@ public interface WorkoutRecordDao {
     void deleteWorkoutRecordById(int id);
     WorkoutRecord getWorkoutRecordById(int id);
     List<WorkoutRecord> getAllWorkoutRecord();
+    boolean existsById(int id);
 }

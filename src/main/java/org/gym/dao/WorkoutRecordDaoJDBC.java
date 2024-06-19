@@ -1,7 +1,6 @@
 package org.gym.dao;
 
 import org.gym.model.WorkoutRecord;
-import org.gym.util.DB;
 import org.gym.util.DbException;
 
 import java.sql.*;
@@ -110,6 +109,20 @@ public class WorkoutRecordDaoJDBC implements WorkoutRecordDao {
             return workoutRecords;
         } catch (SQLException e) {
             throw new DbException("Error while fetching all workout records: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public boolean existsById(int id) {
+        String sql = "SELECT 1 FROM workout_records WHERE id = ?";
+
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, id);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new DbException("Error checking workout record ID: " + e.getMessage());
         }
     }
 

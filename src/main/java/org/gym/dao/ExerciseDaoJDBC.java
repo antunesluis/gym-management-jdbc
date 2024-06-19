@@ -15,6 +15,20 @@ public class ExerciseDaoJDBC implements ExerciseDao {
     }
 
     @Override
+    public boolean existsById(int id) {
+        String sql = "SELECT 1 FROM exercises WHERE id = ?";
+
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, id);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new DbException("Error checking exercise ID: " + e.getMessage());
+        }
+    }
+
+    @Override
     public void addExercise(Exercise exercise) {
         String sql = "INSERT INTO exercises (name, muscles_activated) VALUES (?, ?)";
 

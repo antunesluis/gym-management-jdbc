@@ -11,5 +11,6 @@ public interface ExerciseSetDao {
     void deleteExerciseSetById(int id);
     ExerciseSet getExerciseSetById(int id);
     List<ExerciseSet> getAllExercisesSets();
+    boolean existsById(int id);
 }
 

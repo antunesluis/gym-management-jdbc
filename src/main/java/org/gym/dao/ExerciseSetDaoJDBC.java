@@ -116,6 +116,20 @@ public class ExerciseSetDaoJDBC implements ExerciseSetDao {
         }
     }
 
+    @Override
+    public boolean existsById(int id) {
+        String sql = "SELECT 1 FROM exercise_sets WHERE id = ?";
+
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, id);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new DbException("Error checking exercise set ID: " + e.getMessage());
+        }
+    }
+
     private ExerciseSet instantiateExerciseSet(ResultSet rs) throws SQLException {
         ExerciseSet exerciseSet = new ExerciseSet();
         exerciseSet.setId(rs.getInt("id"));

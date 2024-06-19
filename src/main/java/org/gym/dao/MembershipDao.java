@@ -11,4 +11,5 @@ public interface MembershipDao {
     void deleteMembershipById(int id);
     Membership getMembershipById(int id);
     List<Membership> getAllMemberships();
+    boolean existsById(int id);
 }

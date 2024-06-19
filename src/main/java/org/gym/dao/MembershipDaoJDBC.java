@@ -134,6 +134,20 @@ public class MembershipDaoJDBC implements MembershipDao {
         }
     }
 
+    @Override
+    public boolean existsById(int id) {
+        String sql = "SELECT 1 FROM memberships WHERE id = ?";
+
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, id);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new DbException("Error checking membership ID: " + e.getMessage());
+        }
+    }
+
     private Membership instantiateMembership(ResultSet rs) throws SQLException {
         Membership membership = new Membership();
         membership.setId(rs.getInt("id"));

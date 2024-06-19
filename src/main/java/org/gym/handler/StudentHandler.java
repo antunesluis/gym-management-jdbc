@@ -2,11 +2,15 @@ package org.gym.handler;
 
 import org.gym.dao.DaoFactory;
 import org.gym.dao.StudentDao;
+import org.gym.model.Exercise;
+import org.gym.model.Plan;
 import org.gym.model.Student;
 import org.gym.util.DbException;
+import org.gym.util.ValidationException;
 
 import java.sql.Connection;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Scanner;
 
 public class StudentHandler implements UserActionHandler {
@@ -82,13 +86,11 @@ public class StudentHandler implements UserActionHandler {
         try {
             System.out.print("Enter the ID of the student to update: ");
             int id = Integer.parseInt(scanner.nextLine());
-            Student existingStudent = studentDao.getStudentById(id);
-
-            if (existingStudent == null ) {
-                System.out.println("Student not found.");
-                return;
+            if (!studentDao.existsById(id)) {
+                throw new ValidationException("Exercise not found.");
             }
 
+            Student existingStudent = studentDao.getStudentById(id);
             System.out.print("CPF (current: " + existingStudent.getCpf() + "): ");
             String cpf = scanner.nextLine();
 
@@ -124,12 +126,19 @@ public class StudentHandler implements UserActionHandler {
 
     private void listStudents() {
         try {
-            System.out.println("Listing all students:");
-            studentDao.getAllStudents().forEach(student ->
-                    System.out.println(student.getId() + ": " + student.getName() + " - " + student.getCpf() + " - " + student.getBirthDate()));
-        } catch (DbException e) {
-            System.out.println("Error retrieving students: " + e.getMessage());
-        }
+            List<Student> students = studentDao.getAllStudents();
 
+            if (students.isEmpty()) {
+                System.out.println("No students found.");
+                return;
+            }
+
+            System.out.println("Listing all students:");
+            for (Student student : students) {
+                System.out.println(student);
+            }
+        } catch (DbException e) {
+            System.out.println("Error while listing students: " + e.getMessage());
+        }
     }
 }

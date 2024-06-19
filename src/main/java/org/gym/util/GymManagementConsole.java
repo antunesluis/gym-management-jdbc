@@ -1,10 +1,6 @@
 package org.gym.util;
 
-import org.gym.dao.WorkoutRecordDao;
 import org.gym.handler.*;
-import org.gym.model.ExerciseSet;
-import org.gym.model.ExerciseSetExercise;
-import org.gym.model.WorkoutRecord;
 
 import java.sql.Connection;
 import java.util.Scanner;
@@ -20,7 +16,7 @@ public class GymManagementConsole {
     private final ExerciseSetHandler exerciseSetHandler;
     private final ExerciseSetExerciseHandler exerciseSetExerciseHandler;
 
-    public GymManagementConsole(Connection conn, MembershipHandler membershipHandler, ExerciseSet exerciseSet, ExerciseSetExercise exerciseSetExercise) {
+    public GymManagementConsole(Connection conn) {
         this.scanner = new Scanner(System.in);
         this.studentHandler = new StudentHandler(conn, scanner);
         this.exerciseHandler = new ExerciseHandler(conn, scanner);
@@ -35,6 +31,7 @@ public class GymManagementConsole {
     public void start() {
         String option;
         do {
+            ConsoleUtils.clearScreen();
             displayMenu();
             option = scanner.nextLine();
             try {
@@ -46,10 +43,10 @@ public class GymManagementConsole {
                         planHandler.execute();
                         break;
                     case "3":
-                        workoutHandler.execute();
+                        exerciseHandler.execute();
                         break;
                     case "4":
-                        exerciseHandler.execute();
+                        membershipHandler.execute();
                         break;
                     case "0":
                         System.out.println("Exiting the system...");
@@ -58,6 +55,7 @@ public class GymManagementConsole {
                         System.out.println("Invalid option. Please try again.");
                         break;
                 }
+                ConsoleUtils.waitForEnter();
             } catch (Exception e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -69,8 +67,8 @@ public class GymManagementConsole {
         System.out.println("\nSelect a module to manage:");
         System.out.println("1 - Manage Students");
         System.out.println("2 - Manage Plans");
-        System.out.println("3 - Manage Workouts");
-        System.out.println("4 - Manage Exercises");
+        System.out.println("3 - Manage Exercises");
+        System.out.println("4 - Manage Memberships");
         System.out.println("0 - Exit");
         System.out.print("Option: ");
     }

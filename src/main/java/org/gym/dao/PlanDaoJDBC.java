@@ -113,6 +113,19 @@ public class PlanDaoJDBC implements PlanDao {
         }
     }
 
+    @Override
+    public boolean existsById(int id) {
+        String sql = "SELECT 1 FROM plans WHERE id = ?";
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, id);
+            try (ResultSet rs = st.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new DbException("Error checking plan ID: " + e.getMessage());
+        }
+    }
+
     private Plan instantiatePlan(ResultSet rs) throws SQLException {
         Plan plan = new Plan();
         plan.setId(rs.getInt("id"));
