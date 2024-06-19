@@ -5,6 +5,7 @@ import org.gym.dao.MembershipDao;
 import org.gym.dao.PlanDao;
 import org.gym.dao.StudentDao;
 import org.gym.model.Membership;
+import org.gym.util.ConsoleUtils;
 import org.gym.util.DbException;
 import org.gym.util.ValidationException;
 
@@ -58,26 +59,20 @@ public class MembershipHandler implements UserActionHandler {
                 System.out.println("Validation error: " + e.getMessage());
             } catch (DbException e) {
                 System.out.println("Database error: " + e.getMessage());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
             }
             catch (Exception e) {
                 System.out.println("An unexpected error occurred: " + e.getMessage());
             }
+            ConsoleUtils.waitForEnter();
         } while (!option.equals("0"));
     }
 
     private void addMembership() {
         try {
-            System.out.print("Student ID: ");
-            int studentId = Integer.parseInt(scanner.nextLine());
-            if (!studentDao.existsById(studentId)) {
-                throw new ValidationException("Student ID not found.");
-            }
-
-            System.out.print("Plan ID: ");
-            int planId = Integer.parseInt(scanner.nextLine());
-            if (!planDao.existsById(planId)) {
-                throw new ValidationException("Plan ID not found.");
-            }
+            int studentId = getValidStudentId();
+            int planId = getValidPlanId();
 
             System.out.print("Start Date (yyyy-mm-dd): ");
             String startDateString = scanner.nextLine();
@@ -111,33 +106,16 @@ public class MembershipHandler implements UserActionHandler {
 
     private void updateMembership() {
         try {
-            System.out.print("Enter the ID of the exercise to update: ");
-            int id = Integer.parseInt(scanner.nextLine());
-            if (!membershipDao.existsById(id)) {
-                throw new ValidationException("Workout ID not found.");
-            }
+            int id = getValidMembershipId();
             Membership existingMembership = membershipDao.getMembershipById(id);
 
-            System.out.print("Student ID (current: " + existingMembership.getStudentId() + "): ");
-            int studentId = Integer.parseInt(scanner.nextLine());
-            if (!studentDao.existsById(studentId)) {
-                throw new ValidationException("Student ID not found.");
-            }
-
-            System.out.print("Plan ID (current: " + existingMembership.getPlanId() + "): ");
-            int planId = Integer.parseInt(scanner.nextLine());
-            if (!planDao.existsById(planId)) {
-                throw new ValidationException("Plan ID not found.");
-            }
+            int studentId = getValidStudentId();
+            int planId = getValidPlanId();
 
             System.out.print("Start Date (yyyy-mm-dd) (current: " + existingMembership.getStartDate() + "): ");
             String startDateString = scanner.nextLine();
             LocalDate startDate;
-            try {
-                startDate = LocalDate.parse(startDateString);
-            } catch (DateTimeParseException e) {
-                throw new ValidationException("Invalid date format. Please use yyyy-mm-dd.");
-            }
+            startDate = LocalDate.parse(startDateString);
 
             System.out.print("Card Number (current: " + existingMembership.getCardNumber() + "): ");
             String cardNumber = scanner.nextLine();
@@ -148,7 +126,8 @@ public class MembershipHandler implements UserActionHandler {
             System.out.print("Card CVV (current: " + existingMembership.getCardCvv() + "): ");
             String cardCvv = scanner.nextLine();
 
-            membershipDao.updateMembership(existingMembership);
+            Membership updatedMembership = new Membership(id, studentId, planId, null, startDate, cardNumber, cardHolderName, cardExpiryDate, cardCvv);
+            membershipDao.updateMembership(updatedMembership);
             System.out.println("Membership Update successfully!");
         } catch (DbException e) {
             System.out.println("Error updating exercise: " + e.getMessage());
@@ -156,20 +135,22 @@ public class MembershipHandler implements UserActionHandler {
             System.out.println("Invalid ID format. Please enter a number.");
         } catch (ValidationException e) {
             System.out.println("Validation error: " + e.getMessage());
+        } catch (DateTimeParseException e) {
+            throw new ValidationException("Invalid date format. Please use yyyy-mm-dd.");
         }
     }
 
     private void deleteMembership() {
         try {
-            System.out.print("Enter the ID of the membership to delete: ");
-            int id = Integer.parseInt(scanner.nextLine());
-
+            int id = getValidMembershipId();
             membershipDao.deleteMembershipById(id);
             System.out.println("Plan deleted successfully!");
         } catch (DbException e) {
-            System.out.println("Error deleting plan: " + e.getMessage());
+            System.out.println("Error deleting membership: " + e.getMessage());
         } catch (NumberFormatException e) {
             System.out.println("Invalid ID format. Please enter a number");
+        } catch (ValidationException e) {
+            System.out.println("Validation error: " + e.getMessage());
         }
     }
 
@@ -191,6 +172,33 @@ public class MembershipHandler implements UserActionHandler {
         }
     }
 
+    private int getValidPlanId() throws ValidationException, NumberFormatException {
+        System.out.print("Enter the ID of the Plan: ");
+        int id = Integer.parseInt(scanner.nextLine());
+        if (!planDao.existsById(id)) {
+            throw new ValidationException("Plan not found.");
+        }
+        return id;
+    }
+
+    private int getValidStudentId() throws ValidationException, NumberFormatException {
+        System.out.print("Enter the ID of the Student: ");
+        int id = Integer.parseInt(scanner.nextLine());
+        if (!studentDao.existsById(id)) {
+            throw new ValidationException("Student not found.");
+        }
+        return id;
+    }
+
+    private int getValidMembershipId() throws ValidationException, NumberFormatException {
+        System.out.print("Enter the ID of the Membership: ");
+        int id = Integer.parseInt(scanner.nextLine());
+        if (!studentDao.existsById(id)) {
+            throw new ValidationException("Membership not found.");
+        }
+        return id;
+    }
+
     private void displayMenu() {
         System.out.println("\n-- Manage Memberships --");
         System.out.println("1 - Add Membership");
@@ -198,5 +206,6 @@ public class MembershipHandler implements UserActionHandler {
         System.out.println("3 - Delete Membership");
         System.out.println("4 - List Memberships");
         System.out.println("0 - Back");
-        System.out.print("Select an option: ");    }
+        System.out.print("Select an option: ");
+    }
 }

@@ -3,6 +3,7 @@ package org.gym.handler;
 import org.gym.dao.DaoFactory;
 import org.gym.dao.ExerciseDao;
 import org.gym.model.Exercise;
+import org.gym.util.ConsoleUtils;
 import org.gym.util.DbException;
 import org.gym.util.ValidationException;
 
@@ -46,12 +47,17 @@ public class ExerciseHandler implements UserActionHandler {
                         System.out.println("Invalid option. Please try again.");
                         break;
                 }
+            } catch (ValidationException e) {
+                System.out.println("Validation error: " + e.getMessage());
             } catch (DbException e) {
                 System.out.println("Database error: " + e.getMessage());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
             }
             catch (Exception e) {
                 System.out.println("An unexpected error occurred: " + e.getMessage());
             }
+            ConsoleUtils.waitForEnter();
         } while (!option.equals("0"));
     }
 
@@ -73,11 +79,7 @@ public class ExerciseHandler implements UserActionHandler {
 
     private void updateExercise() {
         try {
-            System.out.print("Enter the ID of the exercise to update: ");
-            int id = Integer.parseInt(scanner.nextLine());
-            if (!exerciseDao.existsById(id)) {
-                throw new ValidationException("Exercise not found.");
-            }
+            int id = getValidExerciseId();
 
             Exercise existingExercise = exerciseDao.getExerciseById(id);
             System.out.print("Name (current: " + existingExercise.getName() + "): ");
@@ -94,20 +96,22 @@ public class ExerciseHandler implements UserActionHandler {
             System.out.println("Error updating exercise: " + e.getMessage());
         } catch (NumberFormatException e) {
             System.out.println("Invalid ID format. Please enter a number.");
+        } catch (ValidationException e) {
+            System.out.println("Validation error: " + e.getMessage());
         }
     }
 
     private void deleteExercise() {
         try {
-            System.out.print("Enter the ID of the exercise to delete: ");
-            int id = Integer.parseInt(scanner.nextLine());
-
+            int id = getValidExerciseId();
             exerciseDao.deleteExerciseById(id);
             System.out.println("Exercise deleted successfully!");
         } catch (DbException e) {
             System.out.println("Error deleting exercise: " + e.getMessage());
         } catch (NumberFormatException e) {
             System.out.println("Invalid ID format. Please enter a number.");
+        } catch (ValidationException e) {
+            System.out.println("Validation error: " + e.getMessage());
         }
     }
 
@@ -120,7 +124,7 @@ public class ExerciseHandler implements UserActionHandler {
                 return;
             }
 
-            System.out.println("Listing all students:");
+            System.out.println("Listing all exercises:");
             for (Exercise exercise : exercises) {
                 System.out.println(exercise);
             }
@@ -129,6 +133,14 @@ public class ExerciseHandler implements UserActionHandler {
         }
     }
 
+    private int getValidExerciseId() throws ValidationException, NumberFormatException {
+        System.out.print("Enter the ID of the Plan: ");
+        int id = Integer.parseInt(scanner.nextLine());
+        if (!exerciseDao.existsById(id)) {
+            throw new ValidationException("Exercise not found.");
+        }
+        return id;
+    }
 
     private void displayMenu() {
         System.out.println("\n-- Manage Exercises --");

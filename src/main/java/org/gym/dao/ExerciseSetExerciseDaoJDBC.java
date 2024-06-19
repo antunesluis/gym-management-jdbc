@@ -29,16 +29,20 @@ public class ExerciseSetExerciseDaoJDBC implements ExerciseSetExerciseDao {
             throw new DbException(e.getMessage());
         }
     }
-
     @Override
-    public void deleteByExerciseSetId(int exerciseSetId) {
-        String sql = "DELETE FROM exercise_set_exercises WHERE exercise_set_id = ?";
+    public void deleteByExerciseSetIdAndExerciseId(int exerciseSetId, int exerciseId) {
+        String sql = "DELETE FROM exercise_set_exercises WHERE exercise_set_id = ? AND exercise_id = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, exerciseSetId);
-            ps.executeUpdate();
+            ps.setInt(2, exerciseId);
+            int rowsDeleted = ps.executeUpdate();
+
+            if (rowsDeleted == 0) {
+                throw new DbException("No records found to delete for exercise set ID " + exerciseSetId + " and exercise ID " + exerciseId);
+            }
         } catch (Exception e) {
-            throw new DbException(e.getMessage());
+            throw new DbException("Error deleting exercise set exercise: " + e.getMessage());
         }
     }
 

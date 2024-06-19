@@ -9,11 +9,13 @@ public class ConsoleUtils {
     }
 
     public static void waitForEnter() {
+        System.out.println("");
         System.out.println("Pressione Enter para continuar...");
         try {
             System.in.read();
         } catch (IOException e) {
             System.out.println("Error waiting for enter: " + e.getMessage());
         }
+        clearScreen();
     }
 }

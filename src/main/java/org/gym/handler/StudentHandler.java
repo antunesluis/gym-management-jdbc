@@ -2,9 +2,8 @@ package org.gym.handler;
 
 import org.gym.dao.DaoFactory;
 import org.gym.dao.StudentDao;
-import org.gym.model.Exercise;
-import org.gym.model.Plan;
 import org.gym.model.Student;
+import org.gym.util.ConsoleUtils;
 import org.gym.util.DbException;
 import org.gym.util.ValidationException;
 
@@ -49,20 +48,18 @@ public class StudentHandler implements UserActionHandler {
                         System.out.println("Invalid option. Please try again.");
                         break;
                 }
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+            } catch (ValidationException e) {
+                System.out.println("Validation error: " + e.getMessage());
+            } catch (DbException e) {
+                System.out.println("Database error: " + e.getMessage());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
             }
+            catch (Exception e) {
+                System.out.println("An unexpected error occurred: " + e.getMessage());
+            }
+            ConsoleUtils.waitForEnter();
         } while (!option.equals("0"));
-    }
-
-    private void displayMenu() {
-        System.out.println("\n-- Manage Students --");
-        System.out.println("1 - Add Student");
-        System.out.println("2 - Update Student");
-        System.out.println("3 - Delete Student");
-        System.out.println("4 - List Students");
-        System.out.println("0 - Back");
-        System.out.print("Select an option: ");
     }
 
     private void addStudent() {
@@ -84,13 +81,9 @@ public class StudentHandler implements UserActionHandler {
 
     private void updateStudent() {
         try {
-            System.out.print("Enter the ID of the student to update: ");
-            int id = Integer.parseInt(scanner.nextLine());
-            if (!studentDao.existsById(id)) {
-                throw new ValidationException("Exercise not found.");
-            }
-
+            int id = getValidStudentId();
             Student existingStudent = studentDao.getStudentById(id);
+
             System.out.print("CPF (current: " + existingStudent.getCpf() + "): ");
             String cpf = scanner.nextLine();
 
@@ -107,13 +100,14 @@ public class StudentHandler implements UserActionHandler {
             System.out.println("Error updating Student: " + e.getMessage());
         } catch (NumberFormatException e ) {
             System.out.println("Invalid ID format. Please enter a number");
+        } catch (ValidationException e) {
+            System.out.println("Validation error: " + e.getMessage());
         }
     }
 
     private void deleteStudent() {
         try {
-            System.out.print("Enter the ID of the student to delete: ");
-            int id = Integer.parseInt(scanner.nextLine());
+            int id = getValidStudentId();
 
             studentDao.deleteStudentById(id);
             System.out.println("Student deleted successfully!");
@@ -121,6 +115,8 @@ public class StudentHandler implements UserActionHandler {
             System.out.println("Error deleting student: " + e.getMessage());
         } catch (NumberFormatException e ) {
             System.out.println("Invalid ID format. Please enter a number");
+        } catch (ValidationException e ) {
+            System.out.println("Validation error: " + e.getMessage());
         }
     }
 
@@ -140,5 +136,24 @@ public class StudentHandler implements UserActionHandler {
         } catch (DbException e) {
             System.out.println("Error while listing students: " + e.getMessage());
         }
+    }
+
+    private int getValidStudentId() throws ValidationException, NumberFormatException {
+        System.out.print("Enter the ID of the Student: ");
+        int id = Integer.parseInt(scanner.nextLine());
+        if (!studentDao.existsById(id)) {
+            throw new ValidationException("Student not found.");
+        }
+        return id;
+    }
+
+    private void displayMenu() {
+        System.out.println("\n-- Manage Students --");
+        System.out.println("1 - Add Student");
+        System.out.println("2 - Update Student");
+        System.out.println("3 - Delete Student");
+        System.out.println("4 - List Students");
+        System.out.println("0 - Back");
+        System.out.print("Select an option: ");
     }
 }

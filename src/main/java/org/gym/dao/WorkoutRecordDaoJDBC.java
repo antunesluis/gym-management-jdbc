@@ -126,6 +126,25 @@ public class WorkoutRecordDaoJDBC implements WorkoutRecordDao {
         }
     }
 
+    @Override
+    public List<WorkoutRecord> getWorkoutRecordsByWorkoutId(int workoutId) {
+        String sql = "SELECT id, workout_id, exercise_id, exercise_completed, load, completion_date FROM workout_records WHERE workout_id = ?";
+
+        try (PreparedStatement st = conn.prepareStatement(sql)) {
+            st.setInt(1, workoutId);
+            try (ResultSet rs = st.executeQuery()) {
+                List<WorkoutRecord> workoutRecords = new ArrayList<>();
+                while (rs.next()) {
+                    WorkoutRecord workoutRecord = instantiateWorkoutRecord(rs);
+                    workoutRecords.add(workoutRecord);
+                }
+                return workoutRecords;
+            }
+        } catch (SQLException e) {
+            throw new DbException("Error while fetching workout records by workout ID: " + e.getMessage());
+        }
+    }
+
     private WorkoutRecord instantiateWorkoutRecord(ResultSet rs) throws SQLException {
         WorkoutRecord workoutRecord = new WorkoutRecord();
         workoutRecord.setId(rs.getInt("id"));

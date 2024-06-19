@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface ExerciseSetExerciseDao {
     void insert(ExerciseSetExercise exerciseSetExercise);
-    void deleteByExerciseSetId(int exerciseSetId);
+    void deleteByExerciseSetIdAndExerciseId(int exerciseSetId, int exerciseId);
     List<ExerciseSetExercise> findByExerciseSetId(int exerciseSetId);
 }

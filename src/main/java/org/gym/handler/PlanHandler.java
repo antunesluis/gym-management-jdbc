@@ -2,9 +2,8 @@ package org.gym.handler;
 
 import org.gym.dao.DaoFactory;
 import org.gym.dao.PlanDao;
-import org.gym.model.Membership;
 import org.gym.model.Plan;
-import org.gym.model.Student;
+import org.gym.util.ConsoleUtils;
 import org.gym.util.DbException;
 import org.gym.util.ValidationException;
 
@@ -48,9 +47,17 @@ public class PlanHandler implements UserActionHandler {
                         System.out.println("Invalid option. Please try again.");
                         break;
                 }
-            } catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+            } catch (ValidationException e) {
+                System.out.println("Validation error: " + e.getMessage());
+            } catch (DbException e) {
+                System.out.println("Database error: " + e.getMessage());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a valid number.");
             }
+            catch (Exception e) {
+                System.out.println("An unexpected error occurred: " + e.getMessage());
+            }
+            ConsoleUtils.waitForEnter();
         } while (!option.equals("0"));
     }
 
@@ -67,16 +74,14 @@ public class PlanHandler implements UserActionHandler {
             System.out.println("Plan added successfully!");
         } catch (DbException e ) {
             System.out.println("Error adding plan: " + e.getMessage());
+        } catch (NumberFormatException e ) {
+            System.out.println("Invalid monthly fee");
         }
     }
 
     private void updatePlan() {
         try {
-            System.out.print("Enter the ID of the plan to update: ");
-            int id = Integer.parseInt(scanner.nextLine());
-            if (!planDao.existsById(id)) {
-                throw new ValidationException("Exercise not found.");
-            }
+            int id = getValidPlanId();
 
             Plan existingPlan = planDao.getPlanById(id);
             System.out.print("Name (current: " + existingPlan.getName() + "): ");
@@ -92,20 +97,22 @@ public class PlanHandler implements UserActionHandler {
             System.out.println("Error updating Plan: " + e.getMessage());
         } catch (NumberFormatException e ) {
             System.out.println("Invalid data input. Please enter a number");
+        } catch (ValidationException e) {
+            System.out.println("Validation error: " + e.getMessage());
         }
     }
 
     private void deletePlan() {
         try {
-            System.out.print("Enter the ID of the plan to delete: ");
-            int id = Integer.parseInt(scanner.nextLine());
-
+            int id = getValidPlanId();
             planDao.deletePlanById(id);
             System.out.println("Plan deleted successfully!");
         } catch (DbException e ) {
             System.out.println("Error deleting plan: " + e.getMessage());
         } catch (NumberFormatException e ) {
             System.out.println("Invalid ID format. Please enter a number");
+        } catch (ValidationException e) {
+            System.out.println("Validation error: " + e.getMessage());
         }
     }
 
@@ -123,8 +130,17 @@ public class PlanHandler implements UserActionHandler {
                 System.out.println(plan);
             }
         } catch (DbException e) {
-            System.out.println("Error while listing memberships: " + e.getMessage());
+            System.out.println("Error while listing plans: " + e.getMessage());
         }
+    }
+
+    private int getValidPlanId() throws ValidationException, NumberFormatException {
+        System.out.print("Enter the ID of the Plan: ");
+        int id = Integer.parseInt(scanner.nextLine());
+        if (!planDao.existsById(id)) {
+            throw new ValidationException("Plan not found.");
+        }
+        return id;
     }
 
     private void displayMenu() {
